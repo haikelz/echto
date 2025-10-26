@@ -34,13 +34,13 @@ func Init(cfg config.DatabaseConfig) *gorm.DB {
 	}
 
 	// Configure connection pool
-	sqlDB.SetMaxIdleConns(cfg.MaxIdleConns)
-	sqlDB.SetMaxOpenConns(cfg.MaxOpenConns)
+	sqlDB.SetMaxIdleConns(cfg.DB_MAX_IDLE_CONNS)
+	sqlDB.SetMaxOpenConns(cfg.DB_MAX_OPEN_CONNS)
 
 	// Parse connection max lifetime
-	connMaxLifetime, err := time.ParseDuration(cfg.ConnMaxLifetime)
+	connMaxLifetime, err := time.ParseDuration(cfg.DB_CONN_MAX_LIFETIME)
 	if err != nil {
-		echtoLogger.Log.Warn().Err(err).Str("value", cfg.ConnMaxLifetime).Msg("Invalid conn_max_lifetime, using default")
+		echtoLogger.Log.Warn().Err(err).Str("value", cfg.DB_CONN_MAX_LIFETIME).Msg("Invalid conn_max_lifetime, using default")
 		connMaxLifetime = time.Hour
 	}
 	sqlDB.SetConnMaxLifetime(connMaxLifetime)
@@ -56,11 +56,11 @@ func Init(cfg config.DatabaseConfig) *gorm.DB {
 
 func buildDSN(cfg config.DatabaseConfig) string {
 	return fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
-		cfg.Host,
-		cfg.Port,
-		cfg.User,
-		cfg.Password,
-		cfg.Name,
-		cfg.SSLMode,
+		cfg.DB_HOST,
+		cfg.DB_PORT,
+		cfg.DB_USER,
+		cfg.DB_PASSWORD,
+		cfg.DB_NAME,
+		cfg.DB_SSL_MODE,
 	)
 }

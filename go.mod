@@ -4,7 +4,6 @@ go 1.21
 
 require (
 	github.com/go-playground/validator/v10 v10.16.0
-	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo/v4 v4.11.4
 	github.com/rs/zerolog v1.32.0
 	github.com/spf13/viper v1.18.2

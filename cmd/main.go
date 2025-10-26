@@ -5,15 +5,17 @@ import (
 	"echto/internal/database"
 	"echto/internal/handler"
 	"echto/internal/repository"
+	routes "echto/internal/route"
 	"echto/internal/service"
 	"echto/pkg/logger"
 	echtoMiddleware "echto/pkg/middleware"
 	"fmt"
 
+	_ "echto/pkg/swagger"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/rs/zerolog/log"
-	echoSwagger "github.com/swaggo/echo-swagger"
 )
 
 // @title Echto API
@@ -35,7 +37,7 @@ func main() {
 	cfg := config.Load()
 
 	// Initialize logger
-	logger.Init(cfg.Logging.Level, cfg.Logging.Format)
+	logger.Init(cfg.Logging.LOG_LEVEL, cfg.Logging.LOG_FORMAT)
 
 	// Initialize database
 	db := database.Init(cfg.Database)
@@ -44,15 +46,6 @@ func main() {
 	if err := database.AutoMigrate(db); err != nil {
 		log.Fatal().Err(err).Msg("Failed to run database migrations")
 	}
-
-	// Initialize repository
-	userRepo := repository.NewUserRepository(db)
-
-	// Initialize service
-	userService := service.NewUserService(userRepo)
-
-	// Initialize handler
-	userHandler := handler.NewUserHandler(userService)
 
 	// Initialize Echo
 	e := echo.New()
@@ -68,33 +61,22 @@ func main() {
 	e.Use(echtoMiddleware.RequestLogger())
 	e.Use(middleware.RequestID())
 
+	// Initialize repository
+	userRepo := repository.NewUserRepository(db)
+
+	// Initialize service
+	userService := service.NewUserService(userRepo)
+
+	// Initialize handler
+	userHandler := handler.NewUserHandler(userService)
+
 	// Routes
-	api := e.Group("/api/v1")
-	{
-		users := api.Group("/users")
-		{
-			users.GET("", userHandler.GetUsers)
-			users.GET("/:id", userHandler.GetUser)
-			users.POST("", userHandler.CreateUser)
-			users.PUT("/:id", userHandler.UpdateUser)
-			users.DELETE("/:id", userHandler.DeleteUser)
-		}
-	}
-
-	// Health check
-	e.GET("/health", func(c echo.Context) error {
-		return c.JSON(200, map[string]string{
-			"status":  "ok",
-			"service": "echto",
-		})
-	})
-
-	// Swagger documentation
-	e.GET("/swagger/*", echoSwagger.WrapHandler)
+	routes.UserRoute(e, userHandler)
+	routes.SwaggerRoute(e)
 
 	// Start server
-	log.Info().Str("host", cfg.App.Host).Int("port", cfg.App.Port).Msg("Starting server")
-	if err := e.Start(cfg.App.Host + ":" + fmt.Sprintf("%d", cfg.App.Port)); err != nil {
+	log.Info().Str("host", cfg.App.APP_HOST).Int("port", cfg.App.APP_PORT).Msg("Starting server")
+	if err := e.Start(cfg.App.APP_HOST + ":" + fmt.Sprintf("%d", cfg.App.APP_PORT)); err != nil {
 		log.Fatal().Err(err).Msg("Failed to start server")
 	}
 }
