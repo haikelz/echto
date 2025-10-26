@@ -110,6 +110,6 @@ func setDefaults() {
 	viper.SetDefault("JWT_SECRET", "your-secret-key")
 	viper.SetDefault("JWT_EXPIRE_HOURS", 24)
 	viper.SetDefault("APP_NAME", "echto")
-	viper.SetDefault("APP_PORT", 8080)
+	viper.SetDefault("APP_PORT", 9090)
 	viper.SetDefault("APP_HOST", "localhost")
 }

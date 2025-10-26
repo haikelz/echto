@@ -33,5 +33,4 @@ func UserRoute(e *echo.Echo, userHandler *handler.UserHandler) {
 			"service": "echto",
 		})
 	})
-
 }

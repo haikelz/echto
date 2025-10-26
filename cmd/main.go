@@ -26,7 +26,7 @@ import (
 // @contact.email support@echto.com
 // @license.name MIT
 // @license.url https://opensource.org/licenses/MIT
-// @host localhost:8080
+// @host localhost:9090
 // @BasePath /
 // @schemes http https
 // @securityDefinitions.apikey ApiKeyAuth
